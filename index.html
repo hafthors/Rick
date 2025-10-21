@@ -1,91 +1,67 @@
-const cardContainer = document.querySelector('[data-js="card-container"]');
-const searchForm = document.querySelector('[data-js="search-bar"]'); // ✅ the <form>
-const searchInput = document.querySelector('.search-bar__input'); // ✅ the input
-const navigation = document.querySelector('[data-js="navigation"]');
-const prevButton = document.querySelector('[data-js="button-prev"]');
-const nextButton = document.querySelector('[data-js="button-next"]');
-const pagination = document.querySelector('[data-js="pagination"]');
-
-// States
-let maxPage = 1;
-let page = 1;
-let searchQuery = "";
-
-// ✅ Fetch characters with pagination + search
-async function fetchCharacters() {
-  try {
-    const url = `https://rickandmortyapi.com/api/character?page=${page}${
-      searchQuery ? `&name=${encodeURIComponent(searchQuery)}` : ""
-    }`;
-
-    const response = await fetch(url);
-
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-
-    const data = await response.json();
-
-    // Update max page
-    maxPage = data.info.pages;
-
-    // Update pagination
-    pagination.textContent = `${page} / ${maxPage}`;
-
-    // Clear and render character cards
-    cardContainer.innerHTML = "";
-    data.results.forEach((character) => {
-      const card = document.createElement("li");
-      card.classList.add("card");
-      card.innerHTML = `
-        <div class="card__image-container">
-          <img class="card__image" src="${character.image}" alt="${character.name}" />
-          <div class="card__image-gradient"></div>
-        </div>
-        <div class="card__content">
-          <h2 class="card__title">${character.name}</h2>
-          <dl class="card__info">
-            <dt class="card__info-title">Status</dt>
-            <dd class="card__info-description">${character.status}</dd>
-            <dt class="card__info-title">Species</dt>
-            <dd class="card__info-description">${character.species}</dd>
-            <dt class="card__info-title">Occurrences</dt>
-            <dd class="card__info-description">${character.episode.length}</dd>
-          </dl>
-        </div>
-      `;
-      cardContainer.appendChild(card);
-    });
-  } catch (error) {
-    console.error("Error fetching characters:", error);
-    cardContainer.innerHTML = `<li><p>No characters found.</p></li>`;
-    pagination.textContent = "0 / 0";
-  }
-}
-
-// ✅ Pagination buttons
-nextButton.addEventListener("click", () => {
-  if (page < maxPage) {
-    page++;
-    fetchCharacters();
-  }
-});
-
-prevButton.addEventListener("click", () => {
-  if (page > 1) {
-    page--;
-    fetchCharacters();
-  }
-});
-
-// ✅ Search form submit
-searchForm.addEventListener("submit", (event) => {
-  event.preventDefault();
-  searchQuery = searchInput.value.trim(); // get search text
-  page = 1; // reset page to 1
-  fetchCharacters();
-});
-
-// ✅ Initial fetch
-fetchCharacters();
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, shrink-to-fit=no"
+    />
+    <title>Rick and Morty Character Log</title>
+    <link rel="stylesheet" href="./styles.css" />
+    <script type="module" src="./index.js"></script>
+  </head>
+  <body>
+    <h1 class="title">Rick and More</h1>
+    <main>
+      <div class="search-bar-container" data-js="search-bar-container">
+        <form action="" class="search-bar" data-js="search-bar">
+          <input
+            name="query"
+            class="search-bar__input"
+            type="text"
+            placeholder="search characters"
+            aria-label="character name"
+          />
+          <button class="search-bar__button" aria-label="search for character">
+            <img
+              class="search-bar__icon"
+              src="assets/magnifying-glass.png"
+              alt=""
+            />
+          </button>
+        </form>
+      </div>
+      <ul class="card-container" data-js="card-container">
+        <li class="card">
+          <div class="card__image-container">
+            <img
+              class="card__image"
+              src="https://rickandmortyapi.com/api/character/avatar/1.jpeg"
+              alt="Rick Sanchez"
+            />
+            <div class="card__image-gradient"></div>
+          </div>
+          <div class="card__content">
+            <h2 class="card__title">Rick Sanchez</h2>
+            <dl class="card__info">
+              <dt class="card__info-title">Status</dt>
+              <dd class="card__info-description">Alive</dd>
+              <dt class="card__info-title">Type</dt>
+              <dd class="card__info-description"></dd>
+              <dt class="card__info-title">Occurrences</dt>
+              <dd class="card__info-description">51</dd>
+            </dl>
+          </div>
+        </li>
+      </ul>
+    </main>
+    <nav class="navigation" data-js="navigation">
+      <button class="button button--prev" data-js="button-prev">
+        previous
+      </button>
+      <span class="navigation__pagination" data-js="pagination">1 / 1</span>
+      <button class="button button--next" data-js="button-next">next</button>
+    </nav>
+  </body>
+</html>
 
